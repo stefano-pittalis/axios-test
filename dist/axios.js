@@ -1,4 +1,4 @@
-// axios v0.29.0 Copyright (c) 2024 Matt Zabriskie
+// axios v0.30.0 Copyright (c) 2025 Matt Zabriskie
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1174,10 +1174,13 @@
    *
    * @param {string} baseURL The base URL
    * @param {string} requestedURL Absolute or relative URL to combine
+   * @param {boolean} allowAbsoluteUrls Set to true to allow absolute URLs
+   *
    * @returns {string} The combined full path
    */
-  var buildFullPath = function buildFullPath(baseURL, requestedURL) {
-    if (baseURL && !isAbsoluteURL(requestedURL)) {
+  var buildFullPath = function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls) {
+    var isRelativeURL = !isAbsoluteURL(requestedURL);
+    if (baseURL && (isRelativeURL || allowAbsoluteUrls === false)) {
       return combineURLs(baseURL, requestedURL);
     }
     return requestedURL;
@@ -1353,7 +1356,7 @@
         requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
       }
 
-      var fullPath = buildFullPath(config.baseURL, config.url);
+      var fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
 
       request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
 
@@ -1910,7 +1913,7 @@
   };
 
   var data = {
-    "version": "0.29.0"
+    "version": "0.30.0"
   };
 
   var VERSION = data.version;
@@ -2126,7 +2129,7 @@
 
   Axios.prototype.getUri = function getUri(config) {
     config = mergeConfig(this.defaults, config);
-    var fullPath = buildFullPath(config.baseURL, config.url);
+    var fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
     return buildURL(fullPath, config.params, config.paramsSerializer);
   };
 
